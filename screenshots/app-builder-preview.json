@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Phrasewalk",
+      "hasCanvas": false,
+      "bodyTextLen": 1020,
+      "bodyTextHash": "08a55da1a29fa957eaac01954100276116652e7cc6be32cbcde301e045d8991d",
+      "bodyTextPrefix": "Phrasewalk Start a streak Thursday, October 29 Good morning Engl",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Phrasewalk",
+      "hasCanvas": false,
+      "bodyTextLen": 1020,
+      "bodyTextHash": "08a55da1a29fa957eaac01954100276116652e7cc6be32cbcde301e045d8991d",
+      "bodyTextPrefix": "Phrasewalk Start a streak Thursday, October 29 Good morning Engl",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
