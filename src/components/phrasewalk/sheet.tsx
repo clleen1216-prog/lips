@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bookmark, Check, Volume2, X } from "lucide-react";
 import type { Phrase, Story } from "@/data/stories";
+import { zhFor } from "@/data/zh";
 import { useProgress } from "@/lib/progress";
 import { canSpeak, speak } from "@/lib/speech";
 
@@ -57,6 +58,9 @@ export function PhraseSheet({
           {phrase.text}
         </h2>
         <p className="mt-3 text-lg leading-snug text-fg">{phrase.meaning}</p>
+        {progress.settings.showZh && zhFor(phrase.id) && (
+          <p className="mt-1 text-base leading-snug text-primary">{zhFor(phrase.id)}</p>
+        )}
         <p className="mt-5 text-sm font-medium text-primary">You'd reach for it when</p>
         <p className="mt-1 text-base leading-snug text-muted">{phrase.prompt.replace(/:$/, "")}</p>
         <blockquote className="mt-4 border-l-2 border-primary pl-4 font-display text-xl leading-snug text-fg">
@@ -78,7 +82,7 @@ export function PhraseSheet({
             onClick={() => togglePocket(phrase.id)}
             className="press inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-surface px-3 text-sm font-medium text-fg shadow-border"
           >
-            <Bookmark className={`size-4 ${saved ? "fill-primary text-primary" : ""}`} />
+            <Bookmark key={String(saved)} className={`size-4 ${saved ? "pop fill-primary text-primary" : ""}`} />
             {saved ? "In pocket" : "Pocket it"}
           </button>
           <button
@@ -88,7 +92,7 @@ export function PhraseSheet({
               known ? "bg-primary text-primary-fg" : "bg-surface text-fg shadow-border"
             }`}
           >
-            <Check className="size-4" />
+            <Check key={String(known)} className={`size-4 ${known ? "pop" : ""}`} />
             {known ? "I know this" : "Got it"}
           </button>
         </div>
