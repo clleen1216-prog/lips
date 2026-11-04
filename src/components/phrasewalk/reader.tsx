@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { levelNames, levelOf } from "@/data/levels";
 import { parseStory, storyById } from "@/data/stories";
+import { zhFor } from "@/data/zh";
 import { useProgress } from "@/lib/progress";
 
 export function Reader({
@@ -8,11 +10,15 @@ export function Reader({
   onBack,
   onPhrase,
   onPractice,
+  onCheck,
+  onWrite,
 }: {
   storyId: string;
   onBack: () => void;
   onPhrase: (phraseId: string) => void;
   onPractice: () => void;
+  onCheck: () => void;
+  onWrite: () => void;
 }) {
   const story = storyById(storyId);
   const { progress, markWalked } = useProgress();
@@ -37,7 +43,7 @@ export function Reader({
         Back
       </button>
       <p className="mt-3 text-sm font-medium text-primary">
-        {story.category} · {story.topic}
+        {story.category} · {story.topic} · {levelNames[levelOf(story.id)]}
       </p>
       <h1 className="mt-1 font-display text-4xl leading-tight">{story.title}</h1>
       <p className="mt-2 text-base text-muted">{story.scene}</p>
@@ -79,6 +85,9 @@ export function Reader({
               <button type="button" onClick={() => onPhrase(phrase.id)} className="press w-full rounded-2xl bg-bg px-4 py-3 text-left">
                 <span className="block font-medium text-primary">{phrase.text}</span>
                 <span className="mt-0.5 block text-sm text-muted">{phrase.meaning}</span>
+                {progress.settings.showZh && zhFor(phrase.id) && (
+                  <span className="mt-0.5 block text-sm text-primary">{zhFor(phrase.id)}</span>
+                )}
               </button>
             </li>
           ))}
@@ -94,6 +103,28 @@ export function Reader({
           Say it out loud
           <ArrowRight className="size-4" />
         </button>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              markWalked(story.id);
+              onCheck();
+            }}
+            className="press inline-flex min-h-12 items-center justify-center rounded-full bg-bg text-sm font-medium text-fg"
+          >
+            Check yourself
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              markWalked(story.id);
+              onWrite();
+            }}
+            className="press inline-flex min-h-12 items-center justify-center rounded-full bg-bg text-sm font-medium text-fg"
+          >
+            Write it
+          </button>
+        </div>
         <button
           type="button"
           onClick={() => {

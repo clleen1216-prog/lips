@@ -9,7 +9,7 @@ type Beat = {
   you: string;
 };
 
-function floor(input: {
+export function floor(input: {
   id: string;
   title: string;
   topic: string;

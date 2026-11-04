@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Volume2 } from "lucide-react";
 import { findPhrase } from "@/data/stories";
+import { zhFor } from "@/data/zh";
 import { useProgress } from "@/lib/progress";
 import { canSpeak, speak } from "@/lib/speech";
 
@@ -81,6 +82,9 @@ export function Pocket({
                   <span className="mt-0.5 block text-sm text-muted">
                     {item.phrase.meaning} · {item.story.title}
                   </span>
+                  {progress.settings.showZh && zhFor(item.phrase.id) && (
+                    <span className="mt-0.5 block text-sm text-primary">{zhFor(item.phrase.id)}</span>
+                  )}
                 </button>
               </li>
             ))}
@@ -122,6 +126,7 @@ function Review({
           <>
             <p className="mt-4 font-display text-4xl leading-tight">{item.phrase.text}</p>
             <p className="mt-3 text-base text-muted">{item.phrase.meaning}</p>
+            {zhFor(item.phrase.id) && <p className="mt-1 text-base text-primary">{zhFor(item.phrase.id)}</p>}
             <p className="mt-4 font-display text-xl leading-snug">{item.phrase.reply}</p>
           </>
         ) : (

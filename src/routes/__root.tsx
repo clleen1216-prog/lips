@@ -16,7 +16,14 @@ export const Route = createRootRoute({
         content:
           "Learn the English people actually say. A short everyday story each day, with high-frequency phrases and idioms — almost no grammar.",
       },
-      { name: "theme-color", content: "#F4EEE6" },
+      { name: "theme-color", content: "#F4EEE6", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#181411", media: "(prefers-color-scheme: dark)" },
+    ],
+    // Apply the saved look before first paint so dark mode and text size do not flash.
+    scripts: [
+      {
+        children: `try{var d=document.documentElement,t=localStorage.getItem("phrasewalk.theme");if(t==="dark"||t==="light")d.setAttribute("data-theme",t);var r=localStorage.getItem("phrasewalk.v1");if(r){var z=JSON.parse(r).settings;if(z&&typeof z.textSize==="number")d.setAttribute("data-text",String(z.textSize))}}catch(e){}`,
+      },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },

@@ -1,4 +1,6 @@
 import { fabStories } from "@/data/fab";
+import { moreFabStories } from "@/data/fab-more";
+import { levelOf } from "@/data/levels";
 
 export type Category = "Out" | "Friends" | "Work" | "Home" | "Plans" | "Travel" | "Fab";
 
@@ -988,7 +990,7 @@ He nods, already less worried. "So we {{play-it-by-ear}}."
   },
 ];
 
-export const stories: Story[] = [...lifeStories, ...fabStories];
+export const stories: Story[] = [...lifeStories, ...fabStories, ...moreFabStories];
 
 function validate(list: Story[]) {
   const seen = new Set<string>();
@@ -1028,18 +1030,20 @@ export function storyForDate(date: Date): Story {
   return pickByDay(stories, date);
 }
 
-export function fabForDate(date: Date): Story {
-  return pickByDay(
-    stories.filter((story) => story.category === "Fab"),
-    date,
-  );
+// Level 0 means any level. If nothing matches the level, fall back to the whole group.
+function groupFor(group: "fab" | "life", level: number): Story[] {
+  const all = stories.filter((story) => (group === "fab" ? story.category === "Fab" : story.category !== "Fab"));
+  if (level === 0) return all;
+  const matching = all.filter((story) => levelOf(story.id) === level);
+  return matching.length > 0 ? matching : all;
 }
 
-export function lifeForDate(date: Date): Story {
-  return pickByDay(
-    stories.filter((story) => story.category !== "Fab"),
-    date,
-  );
+export function fabForDate(date: Date, level = 0): Story {
+  return pickByDay(groupFor("fab", level), date);
+}
+
+export function lifeForDate(date: Date, level = 0): Story {
+  return pickByDay(groupFor("life", level), date);
 }
 
 function pickByDay(list: Story[], date: Date): Story {

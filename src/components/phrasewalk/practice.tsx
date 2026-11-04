@@ -1,19 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Mic, Volume2 } from "lucide-react";
 import { findPhrase, storyById, turnsFor } from "@/data/stories";
+import { zhFor } from "@/data/zh";
 import { useProgress } from "@/lib/progress";
 import { canListen, canSpeak, listen, saidIt, speak, stopSpeaking } from "@/lib/speech";
+import { Celebrate } from "./celebrate";
+
+type Outcome = { id: string; ok: boolean };
 
 export function Practice({
   storyId,
   onBack,
   onRead,
   onPocket,
+  onCheck,
 }: {
   storyId: string;
   onBack: () => void;
   onRead: () => void;
   onPocket: (phraseId: string) => void;
+  onCheck: (phraseIds: string[]) => void;
 }) {
   const story = storyById(storyId);
   const turns = useMemo(() => (story ? turnsFor(story) : []), [story]);
@@ -22,15 +28,17 @@ export function Practice({
   const [heard, setHeard] = useState("");
   const [listening, setListening] = useState(false);
   const [hit, setHit] = useState<boolean | null>(null);
-  const [hits, setHits] = useState(0);
+  const [outcomes, setOutcomes] = useState<Outcome[]>([]);
   const [done, setDone] = useState(false);
   const [micOk, setMicOk] = useState(false);
-  const { markWalked, togglePocket, progress } = useProgress();
+  const [micChecked, setMicChecked] = useState(false);
+  const { markWalked, togglePocket, progress, gradeReview, seedReview } = useProgress();
 
   const turn = turns[index];
 
   useEffect(() => {
     setMicOk(canListen());
+    setMicChecked(true);
   }, []);
 
   useEffect(() => {
@@ -44,6 +52,8 @@ export function Practice({
 
   if (!story) return null;
 
+  const hits = outcomes.filter((item) => item.ok).length;
+
   if (done || !turn) {
     return (
       <Result
@@ -51,20 +61,20 @@ export function Practice({
         hits={hits}
         total={turns.length}
         usedMic={micOk}
-        missed={turns.filter((_, i) => i < hits).length === turns.length ? [] : []}
+        missed={outcomes.filter((item) => !item.ok).map((item) => item.id)}
         phraseIds={turns.map((item) => item.phraseId)}
-        hitCount={hits}
         onAgain={() => {
           setIndex(0);
           setShowLine(false);
           setHeard("");
           setHit(null);
-          setHits(0);
+          setOutcomes([]);
           setDone(false);
         }}
         onRead={onRead}
         onBack={onBack}
         onPocket={onPocket}
+        onCheck={onCheck}
         saved={progress.pocket}
         togglePocket={togglePocket}
       />
@@ -74,7 +84,6 @@ export function Practice({
   const reveal = (matched: boolean | null) => {
     setShowLine(true);
     setListening(false);
-    if (matched) setHits((value) => value + 1);
     setHit(matched);
   };
 
@@ -98,9 +107,28 @@ export function Practice({
 
   const checkSpoken = () => {
     const phrase = story.phrases.find((item) => item.id === turn.phraseId);
-    const matched = saidIt(heard, phrase?.text ?? turn.you);
-    reveal(matched);
+    reveal(saidIt(heard, phrase?.text ?? turn.you));
   };
+
+  const advance = (ok: boolean) => {
+    stopSpeaking();
+    const next = [...outcomes, { id: turn.phraseId, ok }];
+    setOutcomes(next);
+    if (index + 1 >= turns.length) {
+      markWalked(story.id);
+      seedReview(turns.map((item) => item.phraseId));
+      gradeReview(next);
+      setDone(true);
+    } else {
+      setIndex((value) => value + 1);
+      setShowLine(false);
+      setHeard("");
+      setHit(null);
+      setListening(false);
+    }
+  };
+
+  const zh = zhFor(turn.phraseId);
 
   return (
     <div>
@@ -162,12 +190,17 @@ export function Practice({
               )}
             </>
           )}
+          {micChecked && !micOk && (
+            <p className="rounded-2xl bg-wash px-4 py-3 text-sm leading-snug text-fg">
+              This browser can't listen, so you will check yourself. Say your line out loud first, then peek.
+            </p>
+          )}
           <button
             type="button"
             onClick={() => reveal(null)}
             className="press inline-flex min-h-12 w-full items-center justify-center rounded-full bg-surface text-sm font-medium text-fg shadow-border"
           >
-            Show me the line
+            {micOk ? "Show me the line" : "I said it. Show me the line"}
           </button>
         </div>
       )}
@@ -178,6 +211,7 @@ export function Practice({
             {hit === true ? "They'd follow you." : hit === false ? "Close. This is the shape people use." : "Say it like this."}
           </p>
           <p className="mt-2 font-display text-2xl leading-snug">{turn.you}</p>
+          {progress.settings.showZh && zh && <p className="mt-2 text-sm text-muted">{zh}</p>}
           {canSpeak() && (
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -197,25 +231,32 @@ export function Practice({
               </button>
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => {
-              stopSpeaking();
-              if (index + 1 >= turns.length) {
-                markWalked(story.id);
-                setDone(true);
-              } else {
-                setIndex((value) => value + 1);
-                setShowLine(false);
-                setHeard("");
-                setHit(null);
-                setListening(false);
-              }
-            }}
-            className="press mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-primary font-medium text-primary-fg"
-          >
-            {index + 1 >= turns.length ? "Finish the conversation" : "I said it"}
-          </button>
+          {micOk ? (
+            <button
+              type="button"
+              onClick={() => advance(hit !== false)}
+              className="press mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-primary font-medium text-primary-fg"
+            >
+              {index + 1 >= turns.length ? "Finish the conversation" : "I said it"}
+            </button>
+          ) : (
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => advance(true)}
+                className="press inline-flex min-h-12 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-fg"
+              >
+                Nailed it
+              </button>
+              <button
+                type="button"
+                onClick={() => advance(false)}
+                className="press inline-flex min-h-12 items-center justify-center rounded-full bg-bg text-sm font-medium text-fg"
+              >
+                Still shaky
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -227,10 +268,12 @@ function Result({
   hits,
   total,
   usedMic,
+  missed,
   onAgain,
   onRead,
   onBack,
   onPocket,
+  onCheck,
   saved,
   togglePocket,
   phraseIds,
@@ -241,33 +284,50 @@ function Result({
   usedMic: boolean;
   missed: string[];
   phraseIds: string[];
-  hitCount: number;
   onAgain: () => void;
   onRead: () => void;
   onBack: () => void;
   onPocket: (id: string) => void;
+  onCheck: (ids: string[]) => void;
   saved: string[];
   togglePocket: (id: string) => void;
 }) {
-  const line = !usedMic
-    ? "You shadowed the whole conversation. Say it once more tomorrow — it gets shorter in your mouth."
-    : hits === total
+  const perfect = hits === total;
+  const line = perfect
+    ? usedMic
       ? "You'd survive that room."
-      : `${hits} of ${total} landed on the first try. You still said the rest out loud. That's the method.`;
+      : "Every line felt solid. Say them once more tomorrow. They get shorter in your mouth."
+    : `${hits} of ${total} felt solid. You still said the rest out loud. That's the method. The shaky ones will come back in your review.`;
 
   return (
-    <div className="rise">
+    <div className="rise relative">
+      {perfect && <Celebrate />}
       <p className="text-sm font-medium text-primary">{title}</p>
-      <h1 className="mt-2 font-display text-4xl leading-tight">{usedMic ? `${hits} of ${total}` : "Spoken"}</h1>
+      <h1 className="mt-2 font-display text-4xl leading-tight">
+        {hits} of {total}
+      </h1>
       <p className="mt-3 text-lg leading-relaxed text-muted">{line}</p>
+      {missed.length > 0 && (
+        <button
+          type="button"
+          onClick={() => onCheck(missed)}
+          className="press mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-primary font-medium text-primary-fg"
+        >
+          Check the {missed.length} shaky {missed.length === 1 ? "line" : "lines"}
+        </button>
+      )}
       <ul className="mt-6 space-y-2">
         {phraseIds.map((id) => {
           const found = findPhrase(id);
           if (!found) return null;
+          const shaky = missed.includes(id);
           return (
             <li key={id} className="rounded-2xl bg-surface p-4 shadow-border">
               <button type="button" onClick={() => onPocket(id)} className="text-left">
-                <span className="block font-medium text-primary">{found.phrase.text}</span>
+                <span className="block font-medium text-primary">
+                  {found.phrase.text}
+                  {shaky && <span className="ml-2 text-xs font-medium text-muted">shaky</span>}
+                </span>
                 <span className="mt-1 block text-sm text-muted">{found.phrase.reply}</span>
               </button>
               <button type="button" onClick={() => togglePocket(id)} className="press mt-3 text-sm font-medium text-fg">
@@ -280,7 +340,9 @@ function Result({
       <button
         type="button"
         onClick={onAgain}
-        className="press mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-primary font-medium text-primary-fg"
+        className={`press mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full font-medium ${
+          missed.length > 0 ? "bg-surface text-fg shadow-border" : "bg-primary text-primary-fg"
+        }`}
       >
         Speak it again
       </button>

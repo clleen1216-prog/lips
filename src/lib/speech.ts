@@ -2,16 +2,31 @@ export function canSpeak() {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
+let slowMode = false;
+let preferredVoice: string | null = null;
+
+export function configureSpeech(options: { slow: boolean; voiceURI: string | null }) {
+  slowMode = options.slow;
+  preferredVoice = options.voiceURI;
+}
+
+export function englishVoices(): SpeechSynthesisVoice[] {
+  if (!canSpeak()) return [];
+  return window.speechSynthesis.getVoices().filter((item) => item.lang.toLowerCase().startsWith("en"));
+}
+
 export function speak(text: string, rate = 0.94) {
   if (!canSpeak()) return;
   const synth = window.speechSynthesis;
   synth.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
-  utterance.rate = rate;
+  utterance.rate = slowMode ? Math.min(rate, 0.78) : rate;
   const voices = synth.getVoices();
   const voice =
-    voices.find((item) => item.lang === "en-US") ?? voices.find((item) => item.lang.toLowerCase().startsWith("en"));
+    (preferredVoice ? voices.find((item) => item.voiceURI === preferredVoice) : undefined) ??
+    voices.find((item) => item.lang === "en-US") ??
+    voices.find((item) => item.lang.toLowerCase().startsWith("en"));
   if (voice) utterance.voice = voice;
   synth.speak(utterance);
 }
