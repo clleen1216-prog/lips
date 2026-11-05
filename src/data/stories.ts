@@ -1,5 +1,7 @@
 import { fabStories } from "@/data/fab";
 import { moreFabStories } from "@/data/fab-more";
+import { fabStoriesTwo } from "@/data/fab-more2";
+import { moreLifeStories } from "@/data/more-life";
 import { levelOf } from "@/data/levels";
 
 export type Category = "Out" | "Friends" | "Work" | "Home" | "Plans" | "Travel" | "Fab";
@@ -990,7 +992,7 @@ He nods, already less worried. "So we {{play-it-by-ear}}."
   },
 ];
 
-export const stories: Story[] = [...lifeStories, ...fabStories, ...moreFabStories];
+export const stories: Story[] = [...lifeStories, ...moreLifeStories, ...fabStories, ...moreFabStories, ...fabStoriesTwo];
 
 function validate(list: Story[]) {
   const seen = new Set<string>();

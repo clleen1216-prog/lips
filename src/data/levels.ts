@@ -4,6 +4,7 @@ export const levelNames: Record<Level, string> = {
   1: "Starter",
   2: "Working",
   3: "Confident",
+
 };
 
 // Level by story id. 1 = short, common lines. 2 = everyday work talk.
@@ -52,6 +53,30 @@ const levels: Record<string, Level> = {
   "fab-rootcause": 3,
   "fab-evidence": 3,
   "fab-yieldreview": 3,
+
+  landlord: 2,
+  doctor: 2,
+  restaurant: 1,
+  hotel: 1,
+  returns: 2,
+  birthday: 1,
+  "time-off": 2,
+  checkin: 1,
+  hike: 1,
+
+  "fab-chat": 1,
+  "fab-lunch": 1,
+  "fab-trainer": 2,
+  "fab-incoming": 2,
+  "fab-overtime": 2,
+  "fab-mistake": 2,
+  "fab-videocall": 2,
+  "fab-complaint": 3,
+  "fab-spc": 3,
+  "fab-release": 3,
+  "fab-qual": 3,
+  "fab-escalate": 3,
+  "fab-review": 3,
 };
 
 export function levelOf(storyId: string): Level {
