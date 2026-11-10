@@ -56,4 +56,11 @@ export const glossary: Term[] = [
   { term: "customer complaint", zh: "客訴", plain: "a formal report from a customer about a problem", say: "We got a customer complaint about particles." },
   { term: "overtime", zh: "加班", plain: "work done after normal hours", say: "Can you do overtime tonight?" },
   { term: "shift lead", zh: "班長", plain: "the person in charge of a shift", say: "Tell the shift lead before you move the lot." },
+  { term: "failure analysis", zh: "失效分析", plain: "studying a failed chip to find out why it failed", say: "Failure analysis found a crack at the pad corner." },
+  { term: "cross-section", zh: "剖面", plain: "a cut through a chip so you can see the layers inside", say: "The cross-section shows a crack near the edge." },
+  { term: "die attach", zh: "晶粒黏著", plain: "the step that fixes a chip onto its base", say: "This pattern is consistent with a die-attach issue." },
+  { term: "observation", zh: "觀察事項", plain: "a note from an audit that is not yet a formal problem", say: "For now it's an observation, not a finding." },
+  { term: "finding", zh: "稽核缺失", plain: "a formal problem found during an audit", say: "The auditor raised one finding." },
+  { term: "verification", zh: "驗證", plain: "a test that proves a fix really works", say: "We need verification before we close the report." },
+  { term: "handover note", zh: "交班紀錄", plain: "the written summary given to the next shift", say: "Check the handover note before you start." },
 ];

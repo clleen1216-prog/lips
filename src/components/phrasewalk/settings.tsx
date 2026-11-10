@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { levelNames } from "@/data/levels";
 import { useProgress, type Focus, type Settings, type ThemeChoice } from "@/lib/progress";
+import { HELP_LABEL, HELP_ORDER, type Help } from "@/lib/scaffold";
 import { canSpeak, englishVoices, speak } from "@/lib/speech";
 
 function Segment<T extends string | number>({
@@ -120,6 +121,16 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
           [3, levelNames[3]],
         ]}
       />
+
+      <Segment<Help>
+        label="Help while you speak"
+        value={s.help}
+        onChange={(value) => setSetting("help", value)}
+        options={HELP_ORDER.map((id) => [id, HELP_LABEL[id]] as const)}
+      />
+      <p className="mt-2 text-sm text-muted">
+        Script shows your whole line. Gaps hides the key words. Starter gives the first words. No help is the real thing.
+      </p>
 
       <Segment<ThemeChoice>
         label="Look"

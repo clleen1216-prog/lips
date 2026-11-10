@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import type { Help } from "./scaffold";
 import { configureSpeech } from "./speech";
 import { grade, sanitizeReview, seedCard, type ReviewMap } from "./srs";
 
@@ -13,6 +14,8 @@ export type Settings = {
   slow: boolean;
   showZh: boolean;
   voiceURI: string | null;
+  /** How much support to show for your lines while speaking. */
+  help: Help;
 };
 
 export type Progress = {
@@ -40,6 +43,7 @@ export const DEFAULT_SETTINGS: Settings = {
   slow: false,
   showZh: true,
   voiceURI: null,
+  help: "gaps",
 };
 
 const EMPTY: Progress = {
@@ -93,6 +97,7 @@ function sanitizeSettings(value: unknown): Settings {
     slow: typeof raw.slow === "boolean" ? raw.slow : DEFAULT_SETTINGS.slow,
     showZh: typeof raw.showZh === "boolean" ? raw.showZh : DEFAULT_SETTINGS.showZh,
     voiceURI: typeof raw.voiceURI === "string" ? raw.voiceURI : null,
+    help: pick(raw.help, ["script", "gaps", "starter", "none"] as const, DEFAULT_SETTINGS.help),
   };
 }
 

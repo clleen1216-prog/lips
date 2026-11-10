@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { storyById, turnsFor } from "@/data/stories";
+import { partnerOf, storyById, turnsFor } from "@/data/stories";
 import { zhFor } from "@/data/zh";
 import { useProgress } from "@/lib/progress";
 import { Celebrate } from "./celebrate";
@@ -106,7 +106,7 @@ export function Write({ storyId, onBack, onPhrase }: { storyId: string; onBack: 
       </button>
       <p className="mt-3 text-sm text-muted">
         Write it · {index + 1} of {turns.length}
-        {story.partner ? ` · with ${story.partner}` : ""}
+        {partnerOf(story) ? ` · with ${partnerOf(story)}` : ""}
       </p>
       <div className="mt-2 flex gap-1.5" aria-hidden="true">
         {turns.map((item, itemIndex) => (
@@ -116,7 +116,7 @@ export function Write({ storyId, onBack, onPhrase }: { storyId: string; onBack: 
 
       {turn.partner && (
         <div className="mt-6 rounded-3xl rounded-bl-md bg-surface p-4 shadow-border">
-          <p className="text-sm font-medium text-muted">{story.partner ?? "Them"}</p>
+          <p className="text-sm font-medium text-muted">{partnerOf(story) ?? "Them"}</p>
           <p className="mt-1 font-display text-xl leading-snug">{turn.partner}</p>
         </div>
       )}

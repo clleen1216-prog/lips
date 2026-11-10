@@ -9,7 +9,7 @@ type Beat = {
   you: string;
 };
 
-function scene(input: {
+export function scene(input: {
   id: string;
   title: string;
   topic: string;

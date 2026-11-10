@@ -1,8 +1,11 @@
 import { fabStories } from "@/data/fab";
 import { moreFabStories } from "@/data/fab-more";
 import { fabStoriesTwo } from "@/data/fab-more2";
+import { fabStoriesThree } from "@/data/fab-more3";
 import { moreLifeStories } from "@/data/more-life";
+import { moreLifeStoriesTwo } from "@/data/more-life2";
 import { levelOf } from "@/data/levels";
+import { leadPartners, leads } from "@/data/leads";
 
 export type Category = "Out" | "Friends" | "Work" | "Home" | "Plans" | "Travel" | "Fab";
 
@@ -992,7 +995,15 @@ He nods, already less worried. "So we {{play-it-by-ear}}."
   },
 ];
 
-export const stories: Story[] = [...lifeStories, ...moreLifeStories, ...fabStories, ...moreFabStories, ...fabStoriesTwo];
+export const stories: Story[] = [
+  ...lifeStories,
+  ...moreLifeStories,
+  ...moreLifeStoriesTwo,
+  ...fabStories,
+  ...moreFabStories,
+  ...fabStoriesTwo,
+  ...fabStoriesThree,
+];
 
 function validate(list: Story[]) {
   const seen = new Set<string>();
@@ -1055,11 +1066,15 @@ function pickByDay(list: Story[], date: Date): Story {
   return list[index]!;
 }
 
+export function partnerOf(story: Story): string | undefined {
+  return story.partner ?? leadPartners[story.id];
+}
+
 export function turnsFor(story: Story): Turn[] {
   if (story.turns && story.turns.length > 0) return story.turns;
   return story.phrases.map((phrase) => ({
     id: phrase.id,
-    partner: "",
+    partner: leads[phrase.id] ?? "",
     cue: phrase.prompt.replace(/:$/, ""),
     you: phrase.reply,
     phraseId: phrase.id,

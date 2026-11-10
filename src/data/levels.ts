@@ -77,6 +77,17 @@ const levels: Record<string, Level> = {
   "fab-qual": 3,
   "fab-escalate": 3,
   "fab-review": 3,
+
+  pharmacy: 1,
+  bank: 2,
+  haircut: 1,
+  taxi: 1,
+  noise: 2,
+  "fab-shiftchange": 1,
+  "fab-hq": 2,
+  "fab-fa": 3,
+  "fab-8dreview": 3,
+  "fab-supaudit": 3,
 };
 
 export function levelOf(storyId: string): Level {
